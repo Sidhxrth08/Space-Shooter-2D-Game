@@ -2,6 +2,8 @@
 
 **Sidharth**
 
+---
+
 This project was created by me using **Kiro AI** during the **2D Game Development Bootcamp** conducted by **Vedam School of Technology**.
 
 ---
