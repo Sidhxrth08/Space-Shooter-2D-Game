@@ -50,6 +50,20 @@
       }
       #btn-left  { left:  max(16px, env(safe-area-inset-left, 16px)); }
       #btn-right { right: max(16px, env(safe-area-inset-right, 16px)); }
+      #btn-shoot {
+        left:        50%;
+        transform:   translateX(-50%);
+        width:       clamp(110px, 28vw, 170px);
+        font-size:   clamp(14px, 3.5vw, 20px);
+        letter-spacing: 2px;
+        background:  rgba(255, 80, 80, 0.18);
+        border-color: rgba(255, 120, 120, 0.50);
+        color:       rgba(255, 200, 200, 0.90);
+      }
+      #btn-shoot.active {
+        background:   rgba(255, 80, 80, 0.42);
+        border-color: rgba(255, 160, 160, 0.85);
+      }
     }
   </style>
 </head>
@@ -59,6 +73,7 @@
 <!-- Mobile directional buttons — hidden on desktop via CSS (pointer: coarse only) -->
 <button id="btn-left"  class="mobile-btn" aria-label="Move left">&#9664;</button>
 <button id="btn-right" class="mobile-btn" aria-label="Move right">&#9654;</button>
+<button id="btn-shoot" class="mobile-btn" aria-label="Shoot">SHOOT</button>
 <script>
 // ── Canvas ────────────────────────────────────────────────────────────────────
 const canvas = document.getElementById('gameCanvas');
