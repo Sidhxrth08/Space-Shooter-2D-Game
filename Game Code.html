@@ -1072,8 +1072,8 @@ function resetGame(){
 
 // ── Update ────────────────────────────────────────────────────────────────────
 function update(){
-  if(keys['ArrowLeft']||mouse.left)  player.x-=player.speed;
-  if(keys['ArrowRight']||mouse.right) player.x+=player.speed;
+  if(keys['ArrowLeft'] ||keys['a']||keys['A']||mouse.left)  player.x-=player.speed;
+  if(keys['ArrowRight']||keys['d']||keys['D']||mouse.right) player.x+=player.speed;
   player.x=Math.max(player.width/2, Math.min(canvas.width-player.width/2, player.x));
   tryShoot(); updateBullets();
   spawnEnemy(); updateEnemies();
@@ -1177,6 +1177,8 @@ function startGame() {
     counting    = true;
     countStart  = performance.now();
     startBGM();
+    // Update mobile UI: hide TAP TO PLAY, show game controls bar
+    if (window._syncMobileUI) window._syncMobileUI();
     return;
   }
   if (gameOver) resetGame();
