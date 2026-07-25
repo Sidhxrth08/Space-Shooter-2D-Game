@@ -2,16 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Space Shooter</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #000; overflow: hidden; font-family: Arial, sans-serif; }
     canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; }
+    /* Mobile: prevent page scroll/zoom while touching the game canvas */
+    @media (pointer: coarse) {
+      canvas { touch-action: none; }
+      body   { touch-action: none; overscroll-behavior: none; }
+    }
+
+    /* ── Mobile touch buttons (hidden on desktop) ───────────────────────── */
+    .mobile-btn {
+      display: none; /* hidden by default — desktop never sees these */
+    }
+    @media (pointer: coarse) {
+      .mobile-btn {
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+        position:        fixed;
+        bottom:          max(24px, env(safe-area-inset-bottom, 24px));
+        width:           clamp(90px, 22vw, 140px);
+        height:          clamp(70px, 14vh, 100px);
+        background:      rgba(255, 255, 255, 0.12);
+        border:          2px solid rgba(255, 255, 255, 0.35);
+        border-radius:   16px;
+        color:           rgba(255, 255, 255, 0.80);
+        font-size:       clamp(28px, 7vw, 48px);
+        font-family:     Arial, sans-serif;
+        font-weight:     bold;
+        user-select:     none;
+        -webkit-user-select: none;
+        touch-action:    none;
+        cursor:          pointer;
+        z-index:         10;
+        /* keep buttons from being covered by the canvas */
+        pointer-events:  auto;
+        /* subtle press feedback handled in JS via .active class */
+        transition:      background 0.06s, border-color 0.06s;
+      }
+      .mobile-btn.active {
+        background:   rgba(255, 255, 255, 0.28);
+        border-color: rgba(255, 255, 255, 0.70);
+      }
+      #btn-left  { left:  max(16px, env(safe-area-inset-left, 16px)); }
+      #btn-right { right: max(16px, env(safe-area-inset-right, 16px)); }
+    }
   </style>
 </head>
 <body>
 <canvas id="gameCanvas"></canvas>
+
+<!-- Mobile directional buttons — hidden on desktop via CSS (pointer: coarse only) -->
+<button id="btn-left"  class="mobile-btn" aria-label="Move left">&#9664;</button>
+<button id="btn-right" class="mobile-btn" aria-label="Move right">&#9654;</button>
 <script>
 // ── Canvas ────────────────────────────────────────────────────────────────────
 const canvas = document.getElementById('gameCanvas');
@@ -72,6 +119,44 @@ window.addEventListener('mouseup', e => {
   if (e.button === 2) mouse.right = false;
 });
 window.addEventListener('contextmenu', e => e.preventDefault());
+
+// ── Mobile: prevent page scroll and pinch-zoom while touching the canvas ──────
+canvas.addEventListener('touchstart',  e => e.preventDefault(), { passive: false });
+canvas.addEventListener('touchmove',   e => e.preventDefault(), { passive: false });
+canvas.addEventListener('touchend',    e => e.preventDefault(), { passive: false });
+canvas.addEventListener('touchcancel', e => e.preventDefault(), { passive: false });
+
+// ── Mobile directional buttons ────────────────────────────────────────────────
+// Wire into the existing keys[] map so update() needs no changes at all.
+(function setupMobileBtns() {
+  const btnLeft  = document.getElementById('btn-left');
+  const btnRight = document.getElementById('btn-right');
+  if (!btnLeft || !btnRight) return;
+
+  function press(btn, key) {
+    keys[key] = true;
+    btn.classList.add('active');
+    // Unlock audio context on first touch (same as keyboard/mouse path)
+    if (!titleScreen && !counting) startBGM();
+  }
+  function release(btn, key) {
+    keys[key] = false;
+    btn.classList.remove('active');
+  }
+
+  // Use pointer events — reliable on both touch and mouse, no ghost clicks
+  btnLeft.addEventListener('pointerdown',  e => { e.preventDefault(); btnLeft.setPointerCapture(e.pointerId);  press(btnLeft,  'ArrowLeft');  }, { passive: false });
+  btnLeft.addEventListener('pointerup',    e => { e.preventDefault(); release(btnLeft,  'ArrowLeft');  });
+  btnLeft.addEventListener('pointercancel',e => { release(btnLeft,  'ArrowLeft');  });
+
+  btnRight.addEventListener('pointerdown',  e => { e.preventDefault(); btnRight.setPointerCapture(e.pointerId); press(btnRight, 'ArrowRight'); }, { passive: false });
+  btnRight.addEventListener('pointerup',    e => { e.preventDefault(); release(btnRight, 'ArrowRight'); });
+  btnRight.addEventListener('pointercancel',e => { release(btnRight, 'ArrowRight'); });
+
+  // Also clear if pointer somehow leaves while held
+  btnLeft.addEventListener('pointerleave',  e => { if (e.buttons) release(btnLeft,  'ArrowLeft');  });
+  btnRight.addEventListener('pointerleave', e => { if (e.buttons) release(btnRight, 'ArrowRight'); });
+})();
 
 // Track mouse position for play button hover
 const mousePos = { x: 0, y: 0 };
