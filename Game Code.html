@@ -14,55 +14,108 @@
       body   { touch-action: none; overscroll-behavior: none; }
     }
 
-    /* ── Mobile touch buttons (hidden on desktop) ───────────────────────── */
-    .mobile-btn {
-      display: none; /* hidden by default — desktop never sees these */
+    /* ── Mobile touch controls (hidden on desktop) ─────────────────────── */
+    #mobile-controls {
+      display: none; /* desktop: completely hidden */
     }
     @media (pointer: coarse) {
+      /* Container — fixed bar across the bottom */
+      #mobile-controls {
+        display:         flex;
+        flex-direction:  row;
+        align-items:     center;
+        justify-content: space-between;
+        position:        fixed;
+        bottom:          0;
+        left:            0;
+        right:           0;
+        padding:         10px
+                         max(14px, env(safe-area-inset-right, 14px))
+                         max(14px, env(safe-area-inset-bottom, 14px))
+                         max(14px, env(safe-area-inset-left,  14px));
+        /* translucent dark strip keeps buttons readable over any background */
+        background:      rgba(0, 0, 0, 0.45);
+        border-top:      1px solid rgba(255, 255, 255, 0.10);
+        z-index:         10;
+        pointer-events:  none; /* let touches pass through the gap areas */
+        gap:             10px;
+      }
+
+      /* Base button style */
       .mobile-btn {
         display:         flex;
         align-items:     center;
         justify-content: center;
-        position:        fixed;
-        bottom:          max(24px, env(safe-area-inset-bottom, 24px));
-        width:           clamp(90px, 22vw, 140px);
-        height:          clamp(70px, 14vh, 100px);
-        background:      rgba(255, 255, 255, 0.12);
-        border:          2px solid rgba(255, 255, 255, 0.35);
-        border-radius:   16px;
-        color:           rgba(255, 255, 255, 0.80);
-        font-size:       clamp(28px, 7vw, 48px);
+        flex:            1 1 0;          /* all three share width equally    */
+        max-width:       160px;          /* cap on very wide landscape phones */
+        height:          clamp(62px, 13vh, 96px);
+        /* glass-like background */
+        background:      rgba(255, 255, 255, 0.10);
+        border:          2px solid rgba(255, 255, 255, 0.28);
+        border-radius:   18px;
+        /* inset highlight on top edge for depth */
+        box-shadow:      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+                         0 2px 8px rgba(0, 0, 0, 0.40);
+        color:           rgba(255, 255, 255, 0.88);
         font-family:     Arial, sans-serif;
         font-weight:     bold;
+        font-size:       clamp(26px, 6.5vw, 44px);
+        line-height:     1;
         user-select:     none;
         -webkit-user-select: none;
         touch-action:    none;
         cursor:          pointer;
-        z-index:         10;
-        /* keep buttons from being covered by the canvas */
-        pointer-events:  auto;
-        /* subtle press feedback handled in JS via .active class */
-        transition:      background 0.06s, border-color 0.06s;
+        pointer-events:  auto;          /* re-enable on the buttons themselves */
+        /* fast press feedback — no distracting animation */
+        transition:      background 0.07s ease, border-color 0.07s ease,
+                         box-shadow  0.07s ease, transform  0.07s ease;
       }
+
+      /* Pressed state */
       .mobile-btn.active {
-        background:   rgba(255, 255, 255, 0.28);
+        background:   rgba(255, 255, 255, 0.26);
         border-color: rgba(255, 255, 255, 0.70);
+        box-shadow:   inset 0 1px 0 rgba(255, 255, 255, 0.30),
+                      0 0 14px rgba(255, 255, 255, 0.20);
+        transform:    scale(0.94);
       }
-      #btn-left  { left:  max(16px, env(safe-area-inset-left, 16px)); }
-      #btn-right { right: max(16px, env(safe-area-inset-right, 16px)); }
+
+      /* LEFT — blue tint */
+      #btn-left {
+        background:   rgba(60, 140, 255, 0.14);
+        border-color: rgba(100, 180, 255, 0.40);
+        color:        rgba(180, 220, 255, 0.92);
+      }
+      #btn-left.active {
+        background:   rgba(60, 140, 255, 0.34);
+        border-color: rgba(140, 200, 255, 0.80);
+      }
+
+      /* RIGHT — blue tint (matches LEFT) */
+      #btn-right {
+        background:   rgba(60, 140, 255, 0.14);
+        border-color: rgba(100, 180, 255, 0.40);
+        color:        rgba(180, 220, 255, 0.92);
+      }
+      #btn-right.active {
+        background:   rgba(60, 140, 255, 0.34);
+        border-color: rgba(140, 200, 255, 0.80);
+      }
+
+      /* SHOOT — red/orange tint, slightly taller label so text fits */
       #btn-shoot {
-        left:        50%;
-        transform:   translateX(-50%);
-        width:       clamp(110px, 28vw, 170px);
-        font-size:   clamp(14px, 3.5vw, 20px);
+        background:   rgba(255, 70, 70, 0.16);
+        border-color: rgba(255, 130, 100, 0.45);
+        color:        rgba(255, 200, 185, 0.95);
+        font-size:    clamp(13px, 3.2vw, 19px);
         letter-spacing: 2px;
-        background:  rgba(255, 80, 80, 0.18);
-        border-color: rgba(255, 120, 120, 0.50);
-        color:       rgba(255, 200, 200, 0.90);
+        text-transform: uppercase;
       }
       #btn-shoot.active {
-        background:   rgba(255, 80, 80, 0.42);
-        border-color: rgba(255, 160, 160, 0.85);
+        background:   rgba(255, 70, 70, 0.40);
+        border-color: rgba(255, 160, 130, 0.85);
+        box-shadow:   inset 0 1px 0 rgba(255, 200, 180, 0.30),
+                      0 0 18px rgba(255, 100, 60, 0.35);
       }
     }
   </style>
@@ -70,10 +123,12 @@
 <body>
 <canvas id="gameCanvas"></canvas>
 
-<!-- Mobile directional buttons — hidden on desktop via CSS (pointer: coarse only) -->
-<button id="btn-left"  class="mobile-btn" aria-label="Move left">&#9664;</button>
-<button id="btn-right" class="mobile-btn" aria-label="Move right">&#9654;</button>
-<button id="btn-shoot" class="mobile-btn" aria-label="Shoot">SHOOT</button>
+<!-- Mobile controls bar — hidden on desktop via CSS (pointer: coarse only) -->
+<div id="mobile-controls">
+  <button id="btn-left"  class="mobile-btn" aria-label="Move left">&#9664;</button>
+  <button id="btn-shoot" class="mobile-btn" aria-label="Shoot">SHOOT</button>
+  <button id="btn-right" class="mobile-btn" aria-label="Move right">&#9654;</button>
+</div>
 <script>
 // ── Canvas ────────────────────────────────────────────────────────────────────
 const canvas = document.getElementById('gameCanvas');
