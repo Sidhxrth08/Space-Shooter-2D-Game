@@ -34,15 +34,15 @@ The game can be played directly in a web browser on a **Laptop/PC**.
 ## 🎮 Game Controls
 
 ### 🚀 Start Game
-🖱️ **Left Click** or **P** → Start the game
+- **Left Click** or **P** → Start the game
 
 ### 🛸 Movement
-⬅️ **Left Click** or **Left Arrow (←)** → Move the spaceship left
+- **Left Click** or **Left Arrow (←)** → Move the spaceship left
 
-➡️ **Right Click** or **Right Arrow (→)** → Move the spaceship right
+- **Right Click** or **Right Arrow (→)** → Move the spaceship right
 
 ### 🔫 Shooting
-💥 **Spacebar** → Fire bullets
+- **Spacebar** → Fire bullets
 
 ---
 
