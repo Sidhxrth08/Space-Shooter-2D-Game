@@ -13,3 +13,8 @@ The project demonstrates the implementation of core game development concepts in
 ## 📜 Certificate
 
 This repository also includes my **Certificate of Participation** awarded for successfully completing the **2D Game Development Bootcamp** conducted by **Vedam School of Technology**.
+
+
+## Link to Play 
+
+https://sidhxrth08.github.io/Space-Shooter-2D-Game//Game%20Code.html
