@@ -2,133 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Space Shooter</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #000; overflow: hidden; font-family: Arial, sans-serif; }
     canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; }
-    /* Mobile: prevent page scroll/zoom while touching the game canvas */
-    @media (pointer: coarse) {
-      canvas { touch-action: none; }
-      body   { touch-action: none; overscroll-behavior: none; }
-    }
-
-    /* ── Mobile touch controls (hidden on desktop) ─────────────────────── */
-    #mobile-controls {
-      display: none; /* desktop: completely hidden */
-    }
-    @media (pointer: coarse) {
-      /* Container — fixed bar across the bottom */
-      #mobile-controls {
-        display:         flex;
-        flex-direction:  row;
-        align-items:     center;
-        justify-content: space-between;
-        position:        fixed;
-        bottom:          0;
-        left:            0;
-        right:           0;
-        padding:         10px
-                         max(14px, env(safe-area-inset-right, 14px))
-                         max(14px, env(safe-area-inset-bottom, 14px))
-                         max(14px, env(safe-area-inset-left,  14px));
-        /* translucent dark strip keeps buttons readable over any background */
-        background:      rgba(0, 0, 0, 0.45);
-        border-top:      1px solid rgba(255, 255, 255, 0.10);
-        z-index:         10;
-        pointer-events:  none; /* let touches pass through the gap areas */
-        gap:             10px;
-      }
-
-      /* Base button style */
-      .mobile-btn {
-        display:         flex;
-        align-items:     center;
-        justify-content: center;
-        flex:            1 1 0;          /* all three share width equally    */
-        max-width:       160px;          /* cap on very wide landscape phones */
-        height:          clamp(62px, 13vh, 96px);
-        /* glass-like background */
-        background:      rgba(255, 255, 255, 0.10);
-        border:          2px solid rgba(255, 255, 255, 0.28);
-        border-radius:   18px;
-        /* inset highlight on top edge for depth */
-        box-shadow:      inset 0 1px 0 rgba(255, 255, 255, 0.18),
-                         0 2px 8px rgba(0, 0, 0, 0.40);
-        color:           rgba(255, 255, 255, 0.88);
-        font-family:     Arial, sans-serif;
-        font-weight:     bold;
-        font-size:       clamp(26px, 6.5vw, 44px);
-        line-height:     1;
-        user-select:     none;
-        -webkit-user-select: none;
-        touch-action:    none;
-        cursor:          pointer;
-        pointer-events:  auto;          /* re-enable on the buttons themselves */
-        /* fast press feedback — no distracting animation */
-        transition:      background 0.07s ease, border-color 0.07s ease,
-                         box-shadow  0.07s ease, transform  0.07s ease;
-      }
-
-      /* Pressed state */
-      .mobile-btn.active {
-        background:   rgba(255, 255, 255, 0.26);
-        border-color: rgba(255, 255, 255, 0.70);
-        box-shadow:   inset 0 1px 0 rgba(255, 255, 255, 0.30),
-                      0 0 14px rgba(255, 255, 255, 0.20);
-        transform:    scale(0.94);
-      }
-
-      /* LEFT — blue tint */
-      #btn-left {
-        background:   rgba(60, 140, 255, 0.14);
-        border-color: rgba(100, 180, 255, 0.40);
-        color:        rgba(180, 220, 255, 0.92);
-      }
-      #btn-left.active {
-        background:   rgba(60, 140, 255, 0.34);
-        border-color: rgba(140, 200, 255, 0.80);
-      }
-
-      /* RIGHT — blue tint (matches LEFT) */
-      #btn-right {
-        background:   rgba(60, 140, 255, 0.14);
-        border-color: rgba(100, 180, 255, 0.40);
-        color:        rgba(180, 220, 255, 0.92);
-      }
-      #btn-right.active {
-        background:   rgba(60, 140, 255, 0.34);
-        border-color: rgba(140, 200, 255, 0.80);
-      }
-
-      /* SHOOT — red/orange tint, slightly taller label so text fits */
-      #btn-shoot {
-        background:   rgba(255, 70, 70, 0.16);
-        border-color: rgba(255, 130, 100, 0.45);
-        color:        rgba(255, 200, 185, 0.95);
-        font-size:    clamp(13px, 3.2vw, 19px);
-        letter-spacing: 2px;
-        text-transform: uppercase;
-      }
-      #btn-shoot.active {
-        background:   rgba(255, 70, 70, 0.40);
-        border-color: rgba(255, 160, 130, 0.85);
-        box-shadow:   inset 0 1px 0 rgba(255, 200, 180, 0.30),
-                      0 0 18px rgba(255, 100, 60, 0.35);
-      }
-    }
   </style>
 </head>
 <body>
 <canvas id="gameCanvas"></canvas>
-
-<!-- Mobile controls bar — hidden on desktop via CSS (pointer: coarse only) -->
-<div id="mobile-controls">
-  <button id="btn-left"  class="mobile-btn" aria-label="Move left">&#9664;</button>
-  <button id="btn-shoot" class="mobile-btn" aria-label="Shoot">SHOOT</button>
-  <button id="btn-right" class="mobile-btn" aria-label="Move right">&#9654;</button>
-</div>
 <script>
 // ── Canvas ────────────────────────────────────────────────────────────────────
 const canvas = document.getElementById('gameCanvas');
@@ -189,52 +72,6 @@ window.addEventListener('mouseup', e => {
   if (e.button === 2) mouse.right = false;
 });
 window.addEventListener('contextmenu', e => e.preventDefault());
-
-// ── Mobile: prevent page scroll and pinch-zoom while touching the canvas ──────
-canvas.addEventListener('touchstart',  e => e.preventDefault(), { passive: false });
-canvas.addEventListener('touchmove',   e => e.preventDefault(), { passive: false });
-canvas.addEventListener('touchend',    e => e.preventDefault(), { passive: false });
-canvas.addEventListener('touchcancel', e => e.preventDefault(), { passive: false });
-
-// ── Mobile directional buttons ────────────────────────────────────────────────
-// Wire into the existing keys[] map so update() needs no changes at all.
-(function setupMobileBtns() {
-  const btnLeft  = document.getElementById('btn-left');
-  const btnRight = document.getElementById('btn-right');
-  const btnShoot = document.getElementById('btn-shoot');
-  if (!btnLeft || !btnRight || !btnShoot) return;
-
-  function press(btn, key) {
-    keys[key] = true;
-    btn.classList.add('active');
-    // Unlock audio context on first touch (same as keyboard/mouse path)
-    if (!titleScreen && !counting) startBGM();
-  }
-  function release(btn, key) {
-    keys[key] = false;
-    btn.classList.remove('active');
-  }
-
-  // Use pointer events — reliable on both touch and mouse, no ghost clicks
-  btnLeft.addEventListener('pointerdown',  e => { e.preventDefault(); btnLeft.setPointerCapture(e.pointerId);  press(btnLeft,  'ArrowLeft');  }, { passive: false });
-  btnLeft.addEventListener('pointerup',    e => { e.preventDefault(); release(btnLeft,  'ArrowLeft');  });
-  btnLeft.addEventListener('pointercancel',e => { release(btnLeft,  'ArrowLeft');  });
-
-  btnRight.addEventListener('pointerdown',  e => { e.preventDefault(); btnRight.setPointerCapture(e.pointerId); press(btnRight, 'ArrowRight'); }, { passive: false });
-  btnRight.addEventListener('pointerup',    e => { e.preventDefault(); release(btnRight, 'ArrowRight'); });
-  btnRight.addEventListener('pointercancel',e => { release(btnRight, 'ArrowRight'); });
-
-  // Shoot button — sets keys[' '] so tryShoot() fires on every game loop tick,
-  // respecting the existing SHOOT_CD / RAPID_CD cooldown with zero extra logic.
-  btnShoot.addEventListener('pointerdown',  e => { e.preventDefault(); btnShoot.setPointerCapture(e.pointerId); press(btnShoot, ' '); }, { passive: false });
-  btnShoot.addEventListener('pointerup',    e => { e.preventDefault(); release(btnShoot, ' '); });
-  btnShoot.addEventListener('pointercancel',e => { release(btnShoot, ' '); });
-
-  // Also clear if pointer somehow leaves while held
-  btnLeft.addEventListener('pointerleave',  e => { if (e.buttons) release(btnLeft,  'ArrowLeft');  });
-  btnRight.addEventListener('pointerleave', e => { if (e.buttons) release(btnRight, 'ArrowRight'); });
-  btnShoot.addEventListener('pointerleave', e => { if (e.buttons) release(btnShoot, ' '); });
-})();
 
 // Track mouse position for play button hover
 const mousePos = { x: 0, y: 0 };
