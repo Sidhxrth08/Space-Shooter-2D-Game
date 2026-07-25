@@ -146,7 +146,8 @@ canvas.addEventListener('touchcancel', e => e.preventDefault(), { passive: false
 (function setupMobileBtns() {
   const btnLeft  = document.getElementById('btn-left');
   const btnRight = document.getElementById('btn-right');
-  if (!btnLeft || !btnRight) return;
+  const btnShoot = document.getElementById('btn-shoot');
+  if (!btnLeft || !btnRight || !btnShoot) return;
 
   function press(btn, key) {
     keys[key] = true;
@@ -168,9 +169,16 @@ canvas.addEventListener('touchcancel', e => e.preventDefault(), { passive: false
   btnRight.addEventListener('pointerup',    e => { e.preventDefault(); release(btnRight, 'ArrowRight'); });
   btnRight.addEventListener('pointercancel',e => { release(btnRight, 'ArrowRight'); });
 
+  // Shoot button — sets keys[' '] so tryShoot() fires on every game loop tick,
+  // respecting the existing SHOOT_CD / RAPID_CD cooldown with zero extra logic.
+  btnShoot.addEventListener('pointerdown',  e => { e.preventDefault(); btnShoot.setPointerCapture(e.pointerId); press(btnShoot, ' '); }, { passive: false });
+  btnShoot.addEventListener('pointerup',    e => { e.preventDefault(); release(btnShoot, ' '); });
+  btnShoot.addEventListener('pointercancel',e => { release(btnShoot, ' '); });
+
   // Also clear if pointer somehow leaves while held
   btnLeft.addEventListener('pointerleave',  e => { if (e.buttons) release(btnLeft,  'ArrowLeft');  });
   btnRight.addEventListener('pointerleave', e => { if (e.buttons) release(btnRight, 'ArrowRight'); });
+  btnShoot.addEventListener('pointerleave', e => { if (e.buttons) release(btnShoot, ' '); });
 })();
 
 // Track mouse position for play button hover
